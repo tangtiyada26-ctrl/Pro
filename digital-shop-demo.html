@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProX — น้องเล็กน่ารัก</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a40;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --glow: #7c3aed66;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans Thai', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid noise texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; position: relative; z-index: 1; min-height: 100vh; }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+
+  .cart-btn {
+    position: relative;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cart-btn:hover { border-color: var(--accent); background: var(--surface); }
+
+  .cart-count {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: -6px; right: -6px;
+  }
+
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 14px;
+  }
+
+  .avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+
+  .btn-logout {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 13px; font-family: 'Noto Sans Thai', sans-serif;
+    transition: color 0.2s;
+  }
+  .btn-logout:hover { color: var(--danger); }
+
+  /* ── LOGIN PAGE ── */
+  #page-login {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(124,58,237,0.15), transparent);
+  }
+
+  .login-box {
+    width: 420px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px;
+    box-shadow: 0 0 80px rgba(124,58,237,0.15);
+    animation: fadeUp 0.5s ease;
+  }
+
+  .login-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .login-sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 36px;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .input-group input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans Thai', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 24px 0;
+    color: var(--muted); font-size: 13px;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .social-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  .btn-social {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-social:hover { border-color: var(--accent); background: var(--bg); }
+
+  .btn-social svg { width: 20px; height: 20px; }
+
+  /* ── SHOP PAGE ── */
+  #page-shop { flex-direction: column; }
+
+  .shop-hero {
+    padding: 48px 40px 32px;
+    background: linear-gradient(180deg, rgba(124,58,237,0.08), transparent);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-sub { color: var(--muted); font-size: 15px; }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 32px 40px;
+  }
+
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .product-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(124,58,237,0.2);
+  }
+
+  .product-banner {
+    height: 120px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, var(--surface));
+  }
+
+  .product-body { padding: 20px; }
+
+  .product-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+    margin-bottom: 10px;
+  }
+
+  .tag-game { color: #f59e0b; border-color: #f59e0b44; background: #f59e0b11; }
+  .tag-software { color: #10b981; border-color: #10b98144; background: #10b98111; }
+  .tag-account { color: #a855f7; border-color: #a855f744; background: #a855f711; }
+
+  .product-name {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .product-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .product-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .product-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .product-price span { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  .btn-add {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Noto Sans Thai', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-add:hover { background: var(--accent2); transform: scale(1.05); }
+
+  .stock-badge {
+    font-size: 12px;
+    color: var(--success);
+    font-family: 'Space Mono', monospace;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .stock-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+  }
+
+  /* ── CART PAGE ── */
+  #page-cart { flex-direction: column; }
+
+  .cart-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    padding: 32px 40px;
+    align-items: start;
+  }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .cart-item {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .cart-item-icon {
+    width: 48px; height: 48px;
+    background: var(--surface2);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-weight: 600; margin-bottom: 4px; }
+  .cart-item-type { font-size: 12px; color: var(--muted); }
+
+  .cart-item-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .btn-remove {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer; font-size: 18px;
+    transition: color 0.2s; padding: 4px;
+  }
+  .btn-remove:hover { color: var(--danger); }
+
+  .order-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: sticky; top: 80px;
+  }
+
+  .summary-row {
+    display: flex; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .summary-row:last-of-type { border-bottom: none; }
+
+  .summary-total {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .payment-methods {
+    display: flex; flex-direction: column; gap: 8px;
+    margin: 16px 0;
+  }
+
+  .payment-option {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+
+  .payment-option:hover, .payment-option.selected {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.1);
+  }
+
+  .payment-option input[type="radio"] { accent-color: var(--accent); }
+
+  .payment-icon { font-size: 22px; }
+
+  /* ── PAYMENT PAGE ── */
+  #page-payment { flex-direction: column; }
+
+  .payment-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 0 20px;
+    width: 100%;
+  }
+
+  .payment-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(124,58,237,0.1);
+  }
+
+  .qr-wrapper {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: inline-block;
+    margin: 20px 0;
+    position: relative;
+  }
+
+  .qr-placeholder {
+    width: 200px; height: 200px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+
+  /* Real-looking QR code made with CSS */
+  .qr-svg { width: 200px; height: 200px; }
+
+  .payment-amount {
+    font-family: 'Space Mono', monospace;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin: 8px 0;
+  }
+
+  .payment-info {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .timer {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    color: var(--warning);
+    margin-bottom: 20px;
+  }
+
+  .btn-confirm {
+    width: 100%;
+    background: linear-gradient(135deg, var(--success), #059669);
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Noto Sans Thai', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-confirm:hover { opacity: 0.9; transform: translateY(-2px); }
+
+  /* ── SUCCESS PAGE ── */
+  #page-success {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(16,185,129,0.1), transparent);
+  }
+
+  .success-card {
+    width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .success-icon {
+    width: 80px; height: 80px;
+    background: rgba(16,185,129,0.15);
+    border: 2px solid var(--success);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 24px;
+    animation: pop 0.4s 0.2s both;
+  }
+
+  .success-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    color: var(--success);
+    margin-bottom: 8px;
+  }
+
+  .key-box {
+    background: var(--bg);
+    border: 1px dashed var(--accent);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--accent2);
+    word-break: break-all;
+  }
+
+  .delivery-info {
+    display: flex; flex-direction: column; gap: 10px;
+    text-align: left;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .delivery-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .btn-back {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+  .btn-back:hover { border-color: var(--accent); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px;
+    color: var(--success);
+    z-index: 999;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  .empty-cart .emoji { font-size: 48px; display: block; margin-bottom: 16px; }
+
+  /* True Money tab */
+  .truemoney-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Space Mono', monospace;
+    outline: none;
+    text-align: center;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .truemoney-input:focus { border-color: var(--accent); }
+
+  .payment-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  .tab-btn.active {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(124,58,237,0.1);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PAGE: LOGIN ══════════════ -->
+<div id="page-login" class="page active">
+  <div class="login-box">
+    <div class="login-logo">ร้านน้องเล็ก</div>
+    <div class="login-sub">รัก</div>
+
+    <div class="input-group">
+      <label>EMAIL</label>
+      <input type="email" placeholder="your@email.com" id="email-input">
+    </div>
+    <div class="input-group">
+      <label>PASSWORD</label>
+      <input type="password" placeholder="••••••••">
+    </div>
+
+    <button class="btn-primary" onclick="login()">เข้าสู่ระบบ</button>
+
+    <div class="divider">หรือเข้าสู่ระบบด้วย</div>
+
+        <div class="social-btns">
+      <button class="btn-social" onclick="loginSocial('Google')">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        เข้าสู่ระบบด้วย Google
+      </button>
+      <button class="btn-social" onclick="loginSocial('Discord')">
+        <svg viewBox="0 0 24 24" fill="#5865F2">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+        </svg>
+        เข้าสู่ระบบด้วย Discord
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: SHOP ══════════════ -->
+<div id="page-shop" class="page">
+  <nav>
+    <div class="logo">NEXKEY</div>
+    <div class="nav-right">
+      <div class="user-chip">
+        <div class="avatar" id="nav-avatar">U</div>
+        <span id="nav-username">user</span>
+        <button class="btn-logout" onclick="logout()">ออก</button>
+      </div>
+      <button class="cart-btn" onclick="goToCart()">
+        🛒 ตะกร้า
+        <span class="cart-count" id="cart-count">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="shop-hero">
+    <div class="hero-title">DIGITAL <span>STORE</span></div>
+    <div class="hero-sub">License Keys · Software · Game Credits · Premium Accounts</div>
+  </div>
+
+  <div class="products-grid" id="products-grid">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: CART ══════════════ -->
+<div id="page-cart" class="page">
+  <nav>
+    <div class="logo">NEXKEY</div>
+    <div class="nav-right">
+      <button class="cart-btn" onclick="showPage('shop')" style="background:none;border-color:var(--border)">
+        ← กลับร้านค้า
+      </button>
+    </div>
+  </nav>
+
+  <div class="cart-layout">
+    <div>
+      <div class="section-title">// สินค้าในตะกร้า</div>
+      <div id="cart-items-list"></div>
+    </div>
+
+    <div class="order-summary">
+      <div class="section-title">// สรุปคำสั่งซื้อ</div>
+
+      <div class="summary-row">
+        <span>รวมสินค้า</span>
+        <span id="summary-subtotal">฿0</span>
+      </div>
+      <div class="summary-row">
+        <span>ค่าบริการ</span>
+        <span style="color:var(--success)">ฟรี</span>
+      </div>
+      <div class="summary-row" style="padding-top:16px;">
+        <span style="font-weight:700;">ยอดรวม</span>
+        <span class="summary-total" id="summary-total">฿0</span>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="section-title">// วิธีชำระเงิน</div>
+        <div class="payment-methods">
+          <label class="payment-option selected" id="opt-promptpay">
+            <input type="radio" name="payment" value="promptpay" checked onchange="selectPayment(this)">
+            <span class="payment-icon">📱</span>
+            <div>
+              <div style="font-weight:600;">PromptPay QR Code</div>
+              <div style="font-size:12px;color:var(--muted);">สแกนจ่ายทันที</div>
+            </div>
+          </label>
+          <label class="payment-option" id="opt-truemoney">
+            <input type="radio" name="payment" value="truemoney" onchange="selectPayment(this)">
+            <span class="payment-icon">🧧</span>
+            <div>
+              <div style="font-weight:600;">TrueMoney ซองอั่งเปา</div>
+              <div style="font-size:12px;color:var(--muted);">วางลิงก์ซองอั่งเปา</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="goToPayment()" id="btn-checkout" style="margin-top:8px;">
+        ชำระเงิน →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: PAYMENT ══════════════ -->
+<div id="page-payment" class="page">
+  <nav>
+    <div class="logo">NEXKEY</div>
+    <div class="nav-right">
+      <button class="cart-btn" onclick="showPage('cart')" style="background:none;border-color:var(--border)">
+        ← กลับตะกร้า
+      </button>
+    </div>
+  </nav>
+
+  <div class="payment-container">
+    <div class="payment-card">
+      <div class="section-title" style="text-align:center;">// ชำระเงิน</div>
+
+      <div class="payment-tabs">
+        <button class="tab-btn active" id="tab-qr" onclick="switchTab('qr')">📱 PromptPay QR</button>
+        <button class="tab-btn" id="tab-tm" onclick="switchTab('tm')">🧧 TrueMoney</button>
+      </div>
+
+      <!-- PromptPay Tab -->
+      <div class="tab-content active" id="tab-qr-content">
+        <div class="qr-wrapper">
+          <!-- Simplified QR visual -->
+          <svg class="qr-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="white"/>
+            <!-- Top-left finder -->
+            <rect x="10" y="10" width="50" height="50" fill="black" rx="4"/>
+            <rect x="17" y="17" width="36" height="36" fill="white" rx="2"/>
+            <rect x="24" y="24" width="22" height="22" fill="black" rx="2"/>
+            <!-- Top-right finder -->
+            <rect x="140" y="10" width="50" height="50" fill="black" rx="4"/>
+            <rect x="147" y="17" width="36" height="36" fill="white" rx="2"/>
+            <rect x="154" y="24" width="22" height="22" fill="black" rx="2"/>
+            <!-- Bottom-left finder -->
+            <rect x="10" y="140" width="50" height="50" fill="black" rx="4"/>
+            <rect x="17" y="147" width="36" height="36" fill="white" rx="2"/>
+            <rect x="24" y="154" width="22" height="22" fill="black" rx="2"/>
+            <!-- Data modules -->
+            <rect x="72" y="10" width="7" height="7" fill="black"/>
+            <rect x="85" y="10" width="7" height="7" fill="black"/>
+            <rect x="98" y="10" width="7" height="7" fill="black"/>
+            <rect x="111" y="10" width="7" height="7" fill="black"/>
+            <rect x="124" y="10" width="7" height="7" fill="black"/>
+            <rect x="72" y="23" width="7" height="7" fill="black"/>
+            <rect x="98" y="23" width="7" height="7" fill="black"/>
+            <rect x="111" y="23" width="7" height="7" fill="black"/>
+            <rect x="72" y="36" width="7" height="7" fill="black"/>
+            <rect x="85" y="36" width="7" height="7" fill="black"/>
+            <rect x="111" y="36" width="7" height="7" fill="black"/>
+            <rect x="124" y="36" width="7" height="7" fill="black"/>
+            <rect x="72" y="49" width="7" height="7" fill="black"/>
+            <rect x="98" y="49" width="7" height="7" fill="black"/>
+            <rect x="124" y="49" width="7" height="7" fill="black"/>
+            <rect x="72" y="62" width="7" height="7" fill="black"/>
+            <rect x="85" y="62" width="7" height="7" fill="black"/>
+            <rect x="98" y="62" width="7" height="7" fill="black"/>
+            <rect x="111" y="62" width="7" height="7" fill="black"/>
+            <rect x="10" y="72" width="7" height="7" fill="black"/>
+            <rect x="23" y="72" width="7" height="7" fill="black"/>
+            <rect x="36" y="72" width="7" height="7" fill="black"/>
+            <rect x="49" y="72" width="7" height="7" fill="black"/>
+            <rect x="72" y="72" width="7" height="7" fill="black"/>
+            <rect x="85" y="72" width="7" height="7" fill="black"/>
+            <rect x="111" y="72" width="7" height="7" fill="black"/>
+            <rect x="137" y="72" width="7" height="7" fill="black"/>
+            <rect x="150" y="72" width="7" height="7" fill="black"/>
+            <rect x="163" y="72" width="7" height="7" fill="black"/>
+            <rect x="176" y="72" width="7" height="7" fill="black"/>
+            <rect x="10" y="85" width="7" height="7" fill="black"/>
+            <rect x="36" y="85" width="7" height="7" fill="black"/>
+            <rect x="72" y="85" width="7" height="7" fill="black"/>
+            <rect x="98" y="85" width="7" height="7" fill="black"/>
+            <rect x="124" y="85" width="7" height="7" fill="black"/>
+            <rect x="137" y="85" width="7" height="7" fill="black"/>
+            <rect x="163" y="85" width="7" height="7" fill="black"/>
+            <rect x="176" y="85" width="7" height="7" fill="black"/>
+            <rect x="10" y="98" width="7" height="7" fill="black"/>
+            <rect x="23" y="98" width="7" height="7" fill="black"/>
+            <rect x="49" y="98" width="7" height="7" fill="black"/>
+            <rect x="72" y="98" width="7" height="7" fill="black"/>
+            <rect x="85" y="98" width="7" height="7" fill="black"/>
+            <rect x="111" y="98" width="7" height="7" fill="black"/>
+            <rect x="137" y="98" width="7" height="7" fill="black"/>
+            <rect x="150" y="98" width="7" height="7" fill="black"/>
+            <rect x="176" y="98" width="7" height="7" fill="black"/>
+            <rect x="10" y="111" width="7" height="7" fill="black"/>
+            <rect x="36" y="111" width="7" height="7" fill="black"/>
+            <rect x="49" y="111" width="7" height="7" fill="black"/>
+            <rect x="98" y="111" width="7" height="7" fill="black"/>
+            <rect x="124" y="111" width="7" height="7" fill="black"/>
+            <rect x="150" y="111" width="7" height="7" fill="black"/>
+            <rect x="163" y="111" width="7" height="7" fill="black"/>
+            <rect x="10" y="124" width="7" height="7" fill="black"/>
+            <rect x="23" y="124" width="7" height="7" fill="black"/>
+            <rect x="36" y="124" width="7" height="7" fill="black"/>
+            <rect x="49" y="124" width="7" height="7" fill="black"/>
+            <rect x="72" y="124" width="7" height="7" fill="black"/>
+            <rect x="85" y="124" width="7" height="7" fill="black"/>
+            <rect x="111" y="124" width="7" height="7" fill="black"/>
+            <rect x="137" y="124" width="7" height="7" fill="black"/>
+            <rect x="163" y="124" width="7" height="7" fill="black"/>
+            <rect x="176" y="124" width="7" height="7" fill="black"/>
+            <rect x="72" y="137" width="7" height="7" fill="black"/>
+            <rect x="98" y="137" width="7" height="7" fill="black"/>
+            <rect x="111" y="137" width="7" height="7" fill="black"/>
+            <rect x="124" y="137" width="7" height="7" fill="black"/>
+            <rect x="150" y="137" width="7" height="7" fill="black"/>
+            <rect x="176" y="137" width="7" height="7" fill="black"/>
+            <rect x="72" y="150" width="7" height="7" fill="black"/>
+            <rect x="85" y="150" width="7" height="7" fill="black"/>
+            <rect x="111" y="150" width="7" height="7" fill="black"/>
+            <rect x="137" y="150" width="7" height="7" fill="black"/>
+            <rect x="163" y="150" width="7" height="7" fill="black"/>
+            <rect x="72" y="163" width="7" height="7" fill="black"/>
+            <rect x="98" y="163" width="7" height="7" fill="black"/>
+            <rect x="124" y="163" width="7" height="7" fill="black"/>
+            <rect x="150" y="163" width="7" height="7" fill="black"/>
+            <rect x="176" y="163" width="7" height="7" fill="black"/>
+            <rect x="72" y="176" width="7" height="7" fill="black"/>
+            <rect x="85" y="176" width="7" height="7" fill="black"/>
+            <rect x="111" y="176" width="7" height="7" fill="black"/>
+            <rect x="124" y="176" width="7" height="7" fill="black"/>
+            <rect x="137" y="176" width="7" height="7" fill="black"/>
+            <rect x="163" y="176" width="7" height="7" fill="black"/>
+            <!-- PromptPay logo area -->
+            <rect x="86" y="86" width="28" height="28" fill="white"/>
+            <text x="100" y="105" text-anchor="middle" font-size="18" fill="#003DA5">🏦</text>
+          </svg>
+        </div>
+
+        <div class="payment-amount" id="pay-amount">฿0</div>
+        <div class="payment-info">
+          โอนมาที่ <strong style="color:var(--text);">091-234-5678</strong><br>
+          ชื่อบัญชี: <strong style="color:var(--text);">นาย ตัวอย่าง ร้านค้า</strong><br>
+          <small style="color:var(--muted);">QR Code นี้มีอายุ 15 นาที</small>
+        </div>
+
+        <div class="timer" id="timer">⏱ 14:59</div>
+      </div>
+
+      <!-- TrueMoney Tab -->
+      <div class="tab-content" id="tab-tm-content">
+        <div style="padding:20px 0;">
+          <div style="font-size:48px;margin-bottom:16px;">🧧</div>
+          <div style="font-weight:700;font-size:18px;margin-bottom:8px;">วางลิงก์ซองอั่งเปา</div>
+          <div class="payment-info" style="margin-bottom:20px;">
+            สร้างซองอั่งเปา TrueMoney จำนวน <strong style="color:var(--accent2);" id="tm-amount">฿0</strong><br>
+            แล้ววางลิงก์ด้านล่างนี้
+          </div>
+          <input class="truemoney-input" type="text" placeholder="https://gift.truemoney.com/campaign/?v=...">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">
+            ตัวอย่าง: https://gift.truemoney.com/campaign/?v=XXXXXXXXXXXXXXX
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-confirm" onclick="confirmPayment()">
+        ✅ ยืนยันการชำระเงิน
+      </button>
+
+      <div style="font-size:12px;color:var(--muted);margin-top:12px;">
+        🔒 ระบบจะส่ง License Key ให้อัตโนมัติหลังยืนยัน
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: SUCCESS ══════════════ -->
+<div id="page-success" class="page">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <div class="success-title">ชำระเงินสำเร็จ!</div>
+    <div style="color:var(--muted);font-size:14px;margin-bottom:8px;">
+      ขอบคุณที่ซื้อสินค้ากับเรา 🎉
+    </div>
+
+    <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin:16px 0 8px;">
+      LICENSE KEY ของคุณ:
+    </div>
+    <div class="key-box" id="result-key">
+      XXXX-XXXX-XXXX-XXXX
+    </div>
+
+    <div class="delivery-info">
+      <div class="delivery-row">
+        <span>📧</span>
+        <span>ส่ง Key ไปยัง Email ของคุณแล้ว</span>
+      </div>
+      <div class="delivery-row">
+        <span>💬</span>
+        <span>ส่ง Key ทาง Discord DM แล้ว</span>
+      </div>
+      <div class="delivery-row">
+        <span>📋</span>
+        <span>คัดลอก Key เก็บไว้ด้วยนะครับ</span>
+      </div>
+    </div>
+
+    <button class="btn-back" onclick="backToShop()">← กลับไปช็อปปิ้งต่อ</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" style="display:none;">
+  <span id="toast-msg">✅ เพิ่มสินค้าแล้ว</span>
+</div>
+
+<script>
+// ── DATA ──
+const products = [
+  { id:1, name:"หนูน้อย101", desc:"น่ารักๆ", price:199, emoji:"🪟", tag:"software", tagLabel:"SOFTWARE", stock:15 },
+  { id:2, name:"หนูน้อย102", desc:"น่ารักๆ", price:299, emoji:"📊", tag:"software", tagLabel:"SOFTWARE", stock:8 },
+  { id:3, name:"หนูน้อย103", desc:"น่ารักๆ", price:399, emoji:"🎮", tag:"game", tagLabel:"GAME", stock:20 },
+  { id:4, name:"หนูน้อย104", desc:"น่ารักๆ", price:499, emoji:"⛏️", tag:"game", tagLabel:"GAME", stock:5 },
+  { id:5, name:"หนูน้อย105", desc:"น่ารักๆ", price:599, emoji:"🎨", tag:"software", tagLabel:"SOFTWARE", stock:3 },
+  { id:6, name:"หนูน้อย106", desc:"น่ารักๆ", price:699, emoji:"💜", tag:"account", tagLabel:"ACCOUNT", stock:12 },
+];
+
+let cart = [];
+let currentUser = '';
+let selectedPayment = 'promptpay';
+let timerInterval;
+
+// ── UTILS ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.display = 'flex';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+// ── AUTH ──
+// =========================
+// IMPORT FIREBASE
+// =========================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// =========================
+// CONFIG 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyADDw-4ZmhOH9V-S1WgzzlIENLdxPb1mCc",
+  authDomain: "prox-66071.firebaseapp.com",
+  projectId: "prox-66071",
+  storageBucket: "prox-66071.firebasestorage.app",
+  messagingSenderId: "16464992034",
+  appId: "1:16464992034:web:74063c0ceac4eb5aba377b",
+  measurementId: "G-72X4BVCV0B"
+};
+// =========================
+// INIT
+// =========================
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// =========================
+// LOGIN
+// =========================
+window.login = function () {
+  const email = document.getElementById('email-input').value;
+  const password = document.querySelector('input[type="password"]').value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      currentUser = user.email;
+      afterLogin();
+    })
+    .catch((error) => {
+      alert("Login failed: " + error.message);
+    });
+};
+
+// =========================
+// REGISTER
+// =========================
+window.register = function () {
+  const email = document.getElementById('email-input').value;
+  const password = document.querySelector('input[type="password"]').value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      alert("สมัครสมาชิกสำเร็จ");
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+};
+
+// =========================
+// GOOGLE LOGIN
+// =========================
+window.loginSocial = function () {
+  const provider = new GoogleAuthProvider();
+
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      currentUser = result.user.displayName;
+      afterLogin();
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+};
+
+// =========================
+// AUTO LOGIN
+// =========================
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user.email;
+    afterLogin();
+  }
+});
+
+// =========================
+// LOGOUT
+// =========================
+window.logout = function () {
+  signOut(auth).then(() => {
+    showPage('login');
+  });
+};
+
+// ── PRODUCTS ──
+function renderProducts() {
+  const grid = document.getElementById('products-grid');
+  grid.innerHTML = products.map((p, i) => `
+    <div class="product-card" style="animation-delay:${i * 0.07}s">
+      <div class="product-banner" style="background:${bannerBg(p.tag)};">
+        <span style="position:relative;z-index:1;font-size:52px;">${p.emoji}</span>
+      </div>
+      <div class="product-body">
+        <span class="product-tag tag-${p.tag}">${p.tagLabel}</span>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price">฿${p.price.toLocaleString()} <span>/ Key</span></div>
+            <div class="stock-badge">IN STOCK (${p.stock})</div>
+          </div>
+          <button class="btn-add" onclick="addToCart(${p.id})">
+            + ใส่ตะกร้า
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function bannerBg(tag) {
+  const m = { game:'linear-gradient(135deg,#1a1a2e,#16213e)', software:'linear-gradient(135deg,#0d1b2a,#1b2838)', account:'linear-gradient(135deg,#1a0a2e,#2d1b69)' };
+  return m[tag] || '#12121a';
+}
+
+// ── CART ──
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  const existing = cart.find(i => i.id === id);
+  if (existing) { existing.qty++; }
+  else { cart.push({ ...product, qty: 1 }); }
+  updateCartCount();
+  showToast('🛒 เพิ่ม ' + product.name + ' แล้ว');
+}
+
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+
+function goToCart() {
+  renderCart();
+  showPage('cart');
+}
+
+function renderCart() {
+  const list = document.getElementById('cart-items-list');
+  if (cart.length === 0) {
+    list.innerHTML = '<div class="empty-cart"><span class="emoji">🛒</span>ตะกร้าว่างเปล่า<br><small>กลับไปเลือกสินค้าก่อนนะครับ</small></div>';
+  } else {
+    list.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-icon">${item.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-type">${item.tagLabel} × ${item.qty}</div>
+        </div>
+        <div class="cart-item-price">฿${(item.price * item.qty).toLocaleString()}</div>
+        <button class="btn-remove" onclick="removeFromCart(${item.id})">✕</button>
+      </div>
+    `).join('');
+  }
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('summary-subtotal').textContent = '฿' + subtotal.toLocaleString();
+  document.getElementById('summary-total').textContent = '฿' + subtotal.toLocaleString();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(i => i.id !== id);
+  updateCartCount();
+  renderCart();
+}
+
+function selectPayment(radio) {
+  selectedPayment = radio.value;
+  document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+  radio.closest('.payment-option').classList.add('selected');
+}
+
+// ── PAYMENT ──
+function goToPayment() {
+  if (cart.length === 0) { showToast('⚠️ ตะกร้าว่างเปล่า!'); return; }
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('pay-amount').textContent = '฿' + total.toLocaleString();
+  document.getElementById('tm-amount').textContent = '฿' + total.toLocaleString();
+
+  // activate right tab
+  if (selectedPayment === 'truemoney') switchTab('tm');
+  else switchTab('qr');
+
+  startTimer();
+  showPage('payment');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab + '-content').classList.add('active');
+}
+
+function startTimer() {
+  let secs = 899;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    secs--;
+    if (secs <= 0) { clearInterval(timerInterval); return; }
+    const m = Math.floor(secs / 60).toString().padStart(2,'0');
+    const s = (secs % 60).toString().padStart(2,'0');
+    document.getElementById('timer').innerHTML = `⏱ ${m}:${s}`;
+  }, 1000);
+}
+
+function confirmPayment() {
+  clearInterval(timerInterval);
+  // Generate fake key
+  const key = Array.from({length:4}, () =>
+    Math.random().toString(36).substr(2,4).toUpperCase()
+  ).join('-');
+  document.getElementById('result-key').textContent = key;
+  cart = [];
+  updateCartCount();
+  showPage('success');
+}
+
+function backToShop() {
+  showPage('shop');
+}
+</script>
+</body>
+</html>
